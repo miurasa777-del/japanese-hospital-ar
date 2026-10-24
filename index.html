@@ -1,23 +1,388 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>病院で 症状を伝えよう｜ARにほんごきょうざい</title><style>
-*{box-sizing:border-box}body{margin:0;overflow:hidden;font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif;background:#f8dfe8;color:#6b3344}
-#hud{position:fixed;z-index:20;top:0;left:0;right:0;padding:12px 14px;background:linear-gradient(180deg,rgba(255,244,246,.96),rgba(255,227,235,.9));pointer-events:auto;color:#7a4154;border-bottom:1px solid rgba(206,136,157,.35)}
-.heading{font-size:17px;font-weight:750;letter-spacing:.01em}.sub{font-size:12px;color:#9a5d74;margin-top:4px}
-#status{font-size:12px;margin-top:7px;color:#b15d77;min-height:16px;font-weight:700}
-#footer{position:fixed;z-index:20;bottom:0;left:0;right:0;padding:12px 12px max(14px,env(safe-area-inset-bottom));background:linear-gradient(0deg,rgba(255,244,246,.98),rgba(255,230,236,.96));pointer-events:auto;color:#7a4154;border-top:1px solid rgba(206,136,157,.35)}
-#dialogue{font-size:17px;font-weight:760;margin-bottom:8px;line-height:1.6;color:#8b3f5d}#detail{font-size:13px;color:#9a5d74;margin-bottom:12px}
-.buttons{display:flex;gap:8px;flex-wrap:wrap}button{flex:1 1 21%;border:1px solid #e7b8c8;border-radius:11px;background:#fff7f9;color:#8b3f5d;padding:11px 7px;font-weight:700;font-size:12px;cursor:pointer;box-shadow:0 1px 0 rgba(255,255,255,.9) inset}button.selected{background:#ffe17a;color:#7a4154;border-color:#e6c85a}
-#links{display:flex;gap:12px;margin-top:10px;font-size:12px}a{color:#b15d77;font-weight:700}#heroArt{position:absolute;top:10px;right:12px;width:120px;height:78px;opacity:.96}#heroArt svg{width:100%;height:100%;display:block}#heroArt .win{fill:#fff8c8}#heroArt .wall{fill:#ffd7e1}#heroArt .roof{fill:#f19ab2}#heroArt .cross{fill:#ffffff}#heroArt .door{fill:#e889a3}#heroArt .ground{fill:#f7c5d2}#fallback{display:none;color:#ffbba6}
-</style><script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script><script src="https://raw.githack.com/AR-js-org/AR.js/3.4.8/aframe/build/aframe-ar.js"></script></head><body><div id="hud"><div id="heroArt" aria-hidden="true"><svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg"><ellipse class="ground" cx="80" cy="85" rx="70" ry="12"/><rect class="wall" x="36" y="24" width="88" height="50" rx="8"/><polygon class="roof" points="30,34 80,8 130,34 124,42 80,20 36,42"/><rect class="door" x="71" y="48" width="18" height="26" rx="4"/><rect class="win" x="48" y="40" width="14" height="12" rx="2"/><rect class="win" x="98" y="40" width="14" height="12" rx="2"/><rect class="cross" x="76" y="28" width="8" height="24" rx="2"/><rect class="cross" x="68" y="36" width="24" height="8" rx="2"/></svg></div><div class="heading">病院で 症状を伝えよう｜AR</div><div class="sub">Hiroマーカーを映して、体の場所を確認しましょう。</div><div id="status">ARを準備しています…</div></div><a-scene embedded vr-mode-ui="enabled:false" renderer="logarithmicDepthBuffer:true;antialias:true" arjs="sourceType:webcam;debugUIEnabled:false;detectionMode:mono;maxDetectionRate:30" >
-<a-marker id="hiro" preset="hiro" emitevents="true" smooth="true" smoothCount="5" smoothTolerance="0.01" smoothThreshold="2"><a-entity position="0 0 0" scale="0.75 0.75 0.75">
-<a-cylinder position="0 0.01 0" radius="0.30" height="0.025" color="#204960"></a-cylinder><a-sphere id="body-head" position="0 0.77 0" radius="0.095" scale="0.88 1.12 0.84" color="#75C0D8" material="roughness: 0.9"></a-sphere>
-<a-cylinder id="body-neck" position="0 0.65 0" radius="0.036" height="0.07" color="#75C0D8" material="roughness: 0.9"></a-cylinder>
-<a-box id="body-chest" position="0 0.535 0" width="0.28" height="0.22" depth="0.115" color="#75C0D8" material="roughness: 0.9"></a-box>
-<a-box id="body-abdomen" position="0 0.365 0" width="0.24" height="0.14" depth="0.105" color="#75C0D8" material="roughness: 0.9"></a-box>
-<a-cylinder id="body-leftarm" position="-0.19 0.47 0" radius="0.037" height="0.27" rotation="0 0 -14" color="#75C0D8" material="roughness: 0.9"></a-cylinder>
-<a-cylinder id="body-rightarm" position="0.19 0.47 0" radius="0.037" height="0.27" rotation="0 0 14" color="#75C0D8" material="roughness: 0.9"></a-cylinder>
-<a-cylinder id="body-leftleg" position="-0.07 0.16 0" radius="0.045" height="0.30" color="#75C0D8" material="roughness: 0.9"></a-cylinder>
-<a-cylinder id="body-rightleg" position="0.07 0.16 0" radius="0.045" height="0.30" color="#75C0D8" material="roughness: 0.9"></a-cylinder><a-ring position="0 0.022 0" rotation="-90 0 0" radius-inner="0.27" radius-outer="0.29" color="#65e2df"></a-ring></a-entity></a-marker><a-entity camera></a-entity></a-scene><div id="footer"><div id="dialogue"></div><div id="detail"></div><div class="buttons"><button data-part="head">頭（あたま）</button><button data-part="chest">胸（むね）</button><button data-part="abdomen">お腹（おなか）</button><button data-part="arm">腕（うで）</button><button data-part="leg">足（あし）</button></div><div id="links"><a href="preview.html">カメラなしで3D確認</a><a href="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/hiro.png" target="_blank" rel="noopener">Hiroマーカー</a></div></div><script>
-const phrases={head:['頭（あたま）','昨日から頭が痛いです。','医師：いつから痛いですか？'],chest:['胸（むね）','息をすると胸が痛いです。','医師：どんなときに痛いですか？'],abdomen:['お腹（おなか）','昨日の夜からお腹が痛いです。','医師：いつから痛いですか？'],arm:['腕（うで）','右の腕が痛いです。','医師：どこが痛いですか？'],leg:['足（あし）','歩くと足が痛いです。','医師：歩くとどうなりますか？']};
-function pick(key){const p=phrases[key];document.querySelector('#dialogue').textContent='「'+p[1]+'」';document.querySelector('#detail').textContent=p[2]+' ／ ばしょ： '+p[0];document.querySelectorAll('[data-part]').forEach(b=>b.classList.toggle('selected',b.dataset.part===key));document.querySelectorAll('[id^="body-"]').forEach(e=>e.setAttribute('color','#75C0D8'));const ids={head:['head'],chest:['chest'],abdomen:['abdomen'],arm:['leftarm','rightarm'],leg:['leftleg','rightleg']}[key];ids.forEach(i=>document.querySelector('#body-'+i)?.setAttribute('color','#FFBE55'));}
-window.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('[data-part]').forEach(b=>b.addEventListener('click',()=>pick(b.dataset.part)));pick('abdomen');const marker=document.querySelector('#hiro');if(marker){marker.addEventListener('markerFound',()=>{document.querySelector('#status').textContent='✓ Hiroマーカーを認識しています';});marker.addEventListener('markerLost',()=>{document.querySelector('#status').textContent='マーカーを映してください（画面から外れると消えます）';});}if(!window.AFRAME){document.querySelector('#status').textContent='読み込みエラー：A-Frameを確認してください';}});
-</script></body></html>
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>病院で症状を伝えよう｜AR</title>
+
+<script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+<script src="https://raw.githack.com/AR-js-org/AR.js/3.4.8/aframe/build/aframe-ar.js"></script>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: system-ui, "Noto Sans JP", sans-serif;
+  background: #f9e1ea;
+  color: #743c55;
+}
+
+a-scene {
+  display: block !important;
+  height: 100vh !important;
+  width: 100% !important;
+}
+
+#top, #bottom {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 20;
+}
+
+#top {
+  top: 0;
+  background: rgba(255,242,246,.94);
+  border-bottom: 1px solid #e6bccb;
+  padding: 12px 88px 12px 14px;
+}
+
+h1 {
+  font-size: 17px;
+  margin: 0 0 6px;
+}
+
+#subtitle, #status {
+  font-size: 12px;
+  margin: 5px 0;
+}
+
+#status {
+  color: #94566e;
+  font-weight: bold;
+}
+
+#bottom {
+  bottom: 0;
+  background: rgba(255,245,249,.97);
+  padding: 12px;
+  border-top: 1px solid #e6bccb;
+}
+
+#phrase {
+  font-size: 17px;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+#doctor {
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+}
+
+button {
+  border: 1px solid #dca6bb;
+  background: #fff7fa;
+  color: #813b59;
+  border-radius: 10px;
+  padding: 12px 2px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+button.selected {
+  background: #ffe17b;
+}
+
+#links {
+  display: flex;
+  gap: 14px;
+  margin-top: 12px;
+  font-size: 12px;
+}
+
+a {
+  color: #9b4764;
+}
+
+#hospital {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  font-size: 43px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="top">
+  <div id="hospital">🏥</div>
+  <h1>病院で症状を伝えよう｜AR</h1>
+  <div id="subtitle">
+    痛い場所を選んで、症状を伝えましょう。
+  </div>
+  <div id="status">
+    Hiroマーカーを映してください。
+  </div>
+</div>
+
+<a-scene
+  embedded
+  vr-mode-ui="enabled: false"
+  renderer="alpha: true; antialias: true"
+  arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono">
+
+  <a-marker
+    id="marker"
+    preset="hiro"
+    emitevents="true"
+    smooth="true"
+    smoothCount="5">
+
+    <a-entity
+      id="person"
+      position="0 0 0"
+      scale="0.8 0.8 0.8">
+
+      <!-- 台座 -->
+      <a-cylinder
+        position="0 0.012 0"
+        radius="0.42"
+        height="0.025"
+        color="#efb6c9">
+      </a-cylinder>
+
+      <!-- 頭 -->
+      <a-sphere
+        id="piece-head"
+        position="0 1.35 0"
+        radius="0.24"
+        color="#f4bfa6">
+      </a-sphere>
+
+      <!-- 髪 -->
+      <a-sphere
+        position="0 1.52 -0.04"
+        radius="0.24"
+        scale="1 0.45 1"
+        color="#604753">
+      </a-sphere>
+
+      <!-- 目 -->
+      <a-sphere
+        position="-0.09 1.38 0.21"
+        radius="0.018"
+        color="#463740">
+      </a-sphere>
+
+      <a-sphere
+        position="0.09 1.38 0.21"
+        radius="0.018"
+        color="#463740">
+      </a-sphere>
+
+      <!-- 口 -->
+      <a-box
+        position="0 1.28 0.226"
+        width="0.09"
+        height="0.012"
+        depth="0.012"
+        color="#b96f78">
+      </a-box>
+
+      <!-- 首 -->
+      <a-cylinder
+        position="0 1.08 0"
+        radius="0.075"
+        height="0.15"
+        color="#f4bfa6">
+      </a-cylinder>
+
+      <!-- 胸・服 -->
+      <a-box
+        id="piece-chest"
+        position="0 0.80 0"
+        width="0.57"
+        height="0.42"
+        depth="0.25"
+        color="#83c6c9">
+      </a-box>
+
+      <!-- お腹 -->
+      <a-box
+        id="piece-abdomen"
+        position="0 0.49 0"
+        width="0.50"
+        height="0.22"
+        depth="0.24"
+        color="#83c6c9">
+      </a-box>
+
+      <!-- 左腕 -->
+      <a-cylinder
+        id="piece-leftarm"
+        position="-0.37 0.73 0"
+        radius="0.085"
+        height="0.48"
+        rotation="0 0 -12"
+        color="#f4bfa6">
+      </a-cylinder>
+
+      <!-- 右腕 -->
+      <a-cylinder
+        id="piece-rightarm"
+        position="0.37 0.73 0"
+        radius="0.085"
+        height="0.48"
+        rotation="0 0 12"
+        color="#f4bfa6">
+      </a-cylinder>
+
+      <!-- 左足 -->
+      <a-cylinder
+        id="piece-leftleg"
+        position="-0.14 0.18 0"
+        radius="0.11"
+        height="0.39"
+        color="#7798ce">
+      </a-cylinder>
+
+      <!-- 右足 -->
+      <a-cylinder
+        id="piece-rightleg"
+        position="0.14 0.18 0"
+        radius="0.11"
+        height="0.39"
+        color="#7798ce">
+      </a-cylinder>
+
+    </a-entity>
+
+  </a-marker>
+
+  <a-entity camera></a-entity>
+
+</a-scene>
+
+<div id="bottom">
+
+  <div id="phrase"></div>
+  <div id="doctor"></div>
+
+  <div class="buttons">
+    <button data-part="head">頭（あたま）</button>
+    <button data-part="chest">胸（むね）</button>
+    <button data-part="abdomen">お腹（おなか）</button>
+    <button data-part="arm">腕（うで）</button>
+    <button data-part="leg">足（あし）</button>
+  </div>
+
+  <div id="links">
+    <a href="preview.html">カメラなしで3D確認</a>
+    <a href="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/hiro.png"
+       target="_blank">Hiroマーカー</a>
+  </div>
+
+</div>
+
+<script>
+const examples = {
+  head: [
+    "昨日から頭が痛いです。",
+    "医師：いつから痛いですか？"
+  ],
+  chest: [
+    "息をすると胸が痛いです。",
+    "医師：どんなときに痛いですか？"
+  ],
+  abdomen: [
+    "昨日の夜からお腹が痛いです。",
+    "医師：いつから痛いですか？"
+  ],
+  arm: [
+    "右の腕が痛いです。",
+    "医師：どこが痛いですか？"
+  ],
+  leg: [
+    "歩くと足が痛いです。",
+    "医師：歩くとどうなりますか？"
+  ]
+};
+
+const colors = {
+  head: "#f4bfa6",
+  chest: "#83c6c9",
+  abdomen: "#83c6c9",
+  leftarm: "#f4bfa6",
+  rightarm: "#f4bfa6",
+  leftleg: "#7798ce",
+  rightleg: "#7798ce"
+};
+
+const targets = {
+  head: ["head"],
+  chest: ["chest"],
+  abdomen: ["abdomen"],
+  arm: ["leftarm", "rightarm"],
+  leg: ["leftleg", "rightleg"]
+};
+
+function selectPart(part) {
+
+  document.getElementById("phrase").textContent =
+    "「" + examples[part][0] + "」";
+
+  document.getElementById("doctor").textContent =
+    examples[part][1];
+
+  Object.entries(colors).forEach(([id, color]) => {
+    document.getElementById("piece-" + id)
+      .setAttribute("color", color);
+  });
+
+  targets[part].forEach(id => {
+    document.getElementById("piece-" + id)
+      .setAttribute("color", "#ffe05e");
+  });
+
+  document.querySelectorAll("button[data-part]").forEach(button => {
+    button.classList.toggle(
+      "selected",
+      button.dataset.part === part
+    );
+  });
+}
+
+document.querySelectorAll("button[data-part]").forEach(button => {
+  button.addEventListener("click", () => {
+    selectPart(button.dataset.part);
+  });
+});
+
+selectPart("abdomen");
+
+const marker = document.getElementById("marker");
+
+marker.addEventListener("markerFound", () => {
+  document.getElementById("status").textContent =
+    "✓ Hiroマーカーを認識しています。";
+});
+
+marker.addEventListener("markerLost", () => {
+  document.getElementById("status").textContent =
+    "Hiroマーカーを映してください。";
+});
+
+if (!window.AFRAME || !AFRAME.components.arjs) {
+  document.getElementById("status").textContent =
+    "ARライブラリの読み込みを確認してください。";
+}
+</script>
+
+</body>
+</html>
